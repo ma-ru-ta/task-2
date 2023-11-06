@@ -1,12 +1,17 @@
 class PostCommentsController < ApplicationController
-  
+
   def create
-    post_image = Book.find(params[:book_id])
+    book = Book.find(params[:book_id])
     comment = current_user.post_comments.new(post_comment_params)
     comment.book_id = book.id
     comment.save
-    redirect_to books_path(book)
-    # ↑コメント後、books/indexであってる？
+    redirect_to request.referer
+  end
+
+  def destroy
+    comment = PostComment.find(params[:id])
+    comment.destroy
+    redirect_to book_path(params[:book_id])
   end
 
   private
@@ -14,5 +19,5 @@ class PostCommentsController < ApplicationController
   def post_comment_params
     params.require(:post_comment).permit(:comment)
   end
-  
+
 end
