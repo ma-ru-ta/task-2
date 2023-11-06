@@ -4,6 +4,11 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  has_many :active_relationships, class_name: "Relationship", foreign_key: "follower_id", dependent: :destroy
+  has_many :passive_relationships, class_name: "Relationship", foreign_key: "followed_id", dependent: :destroy
+  has_many :followings, through: :active_relationships, source: :followed
+  has_many :followers, through: :passive_relationships, source: :follower
+  
   has_many :books, dependent: :destroy
   has_one_attached :profile_image
   has_many :favorites, dependent: :destroy
@@ -13,6 +18,18 @@ class User < ApplicationRecord
   validates :introduction, length: { maximum: 50 }
 
 
+
+  def follow(user)
+    active_relationships.create(followed_id: user.id)
+  end
+  
+  def unfollow(user)
+    active_relationships.find_by(followed_id: user.id).destroy
+  end
+  
+  def following?(user)
+    followings.include?(user)
+  end
 
 
   def get_profile_image
