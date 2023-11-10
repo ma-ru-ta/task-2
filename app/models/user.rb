@@ -40,7 +40,7 @@ class User < ApplicationRecord
   end
   
   def following?(user)
-    followings.include?(user)
+    followings.include?(ucdser)
   end
 
 
